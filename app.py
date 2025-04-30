@@ -265,9 +265,8 @@ def update_widgets_opacity():
     
     
 def extract_attack_data(log_file_path: str, minutes_ago: int = 60, target_name: Optional[str] = None):
-    # Compile regex pattern
-    pattern = re.compile(r"<(?P<log_time_str>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})(?P<character>.*?)\|r attacked (?P<receiver>.*?)\|r using \|cff25fcff(.*?)\|r and caused \|cffff0000\-(?P<total>\d+)|")
-
+    # Compile regex pattern that matches all damage formats
+    pattern = re.compile(r"<(?P<log_time_str>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})(?P<character>.*?)\|r attacked (?P<receiver>.*?)\|r(?: using \|cff57d6ae(.*?)\|r)? and caused \|cffc13d36\-(?P<total>\d+)\|r")
     # Calculate time range
     minutes_ago_time = timedelta(minutes=minutes_ago)
     end_time = datetime.now()
