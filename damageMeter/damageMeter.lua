@@ -155,46 +155,8 @@ local fontSizeLabel = nil
 local fontSizeSlider = nil
 local settingsSaveButton = nil
 local settingsCancelButton = nil
-
-
--- Function to create a button
-function CreateButton(text, x, y, handler)
-    local button = UIParent:CreateWidget("button", text, "UIParent", "")
-    button:SetText(text)
-    ApplyButtonSkin(button, GetButtonSkin())
-    button:AddAnchor("TOPRIGHT", "UIParent", x, y)
-    button:Show(true)
-    button:EnableDrag(true)
-    if handler then
-        button:SetHandler("OnClick", handler)
-    end
-    return button
-end
-
--- Function to get button skin
-function GetButtonSkin()
-    local color = {
-        normal = UIParent:GetFontColor("btn_df"),
-        highlight = UIParent:GetFontColor("btn_ov"),
-        pushed = UIParent:GetFontColor("btn_on"),
-        disabled = UIParent:GetFontColor("btn_dis"),
-        active = UIParent:GetFontColor("lime")
-    }
-
-    return {
-        drawableType = "ninePart",
-        path = "ui/common/default.dds",
-        coordsKey = "btn",
-        autoResize = true,
-        fontColor = color,
-        fontInset = {
-            left = 11,
-            right = 11,
-            top = 0,
-            bottom = 0
-        }
-    }
-end
+local background = nil
+local titleLabel = nil
 
 -- Function to apply button skin
 function ApplyButtonSkin(button, skin)
@@ -225,6 +187,45 @@ function ApplyButtonSkin(button, skin)
     end
 end
 
+-- Function to get button skin
+function GetButtonSkin()
+    local color = {
+        normal = UIParent:GetFontColor("btn_df"),
+        highlight = UIParent:GetFontColor("btn_ov"),
+        pushed = UIParent:GetFontColor("btn_on"),
+        disabled = UIParent:GetFontColor("btn_dis"),
+        active = UIParent:GetFontColor("lime")
+    }
+
+    return {
+        drawableType = "ninePart",
+        path = "ui/common/default.dds",
+        coordsKey = "btn",
+        autoResize = true,
+        fontColor = color,
+        fontInset = {
+            left = 11,
+            right = 11,
+            top = 0,
+            bottom = 0
+        }
+    }
+end
+
+-- Function to create a button
+function CreateButton(text, x, y, handler)
+    local button = UIParent:CreateWidget("button", text, "UIParent", "")
+    button:SetText(text)
+    ApplyButtonSkin(button, GetButtonSkin())
+    button:AddAnchor("TOPRIGHT", "UIParent", x, y)
+    button:Show(true)
+    button:EnableDrag(true)
+    if handler then
+        button:SetHandler("OnClick", handler)
+    end
+    return button
+end
+
 function CreateMeterWindow()
     if mainWindow then
         return mainWindow
@@ -240,11 +241,9 @@ function CreateMeterWindow()
     mainWindow:Show() -- Hide by default
 
     -- Create background
-    local background = nil
     local background = CreateBackground(mainWindow, 300, 400)
 
     -- Create title label
-    local titleLabel = nil
     local titleLabel = mainWindow:CreateChildWidget("label", "titleLabel", 0, false)
     titleLabel:SetText("Damage Meter")
     titleLabel:SetPoint("TOPLEFT", mainWindow, "TOPLEFT", 10, 10)
@@ -261,7 +260,7 @@ function CreateMeterWindow()
     damageList:SetFont("ChatFontNormal")
 
     -- Create settings button
-    local settingsButton = CreateButton("Settings", -300, 15, OpenSettings) 
+    local settingsButton = CreateButton("Settings", -300, 15, OpenSettings)
     settingsButton:SetText("Settings")
     settingsButton:SetPoint("BOTTOMLEFT", mainWindow, "BOTTOMLEFT", 10, 10)
     settingsButton:SetWidth(80)
@@ -275,27 +274,27 @@ function CreateMeterWindow()
     resetButton:SetWidth(80)
     resetButton:SetHeight(20)
     resetButton:SetFont("ChatFontNormal")
+    return mainWindow
 end
 
 -- Function to toggle meter window
 function ToggleMeterWindow()
-    if not mainWindow then
-        mainWindow = CreateMeterWindow()
-    end
-    DebugMessage("Toggling meter window")
-    if mainWindow:IsVisible() then
-        mainWindow:Hide()
-        DebugMessage("Window hidden")
+    if mainWindow then
+        DebugMessage("Toggling meter window")
+        if mainWindow:IsVisible() then
+            mainWindow:Show(false)
+        else
+            mainWindow:Show(true)
+        end
     else
-        mainWindow:Show()
-        DebugMessage("Window shown")
+        mainWindow = CreateMeterWindow()
     end
 end
 
 -- Create meter button
 local function CreateMeterButton()
     DebugMessage("Creating meter button")
-    local button = CreateButton("Meter", -250, 15, ToggleMeterWindow)
+    local button = CreateButton("Meter", 1400, 200, ToggleMeterWindow)
     if not button then
         DebugMessage("ERROR - Failed to create meter button")
         return nil
@@ -309,117 +308,122 @@ local function CreateMeterButton()
     return button
 end
 
--- Create meter button
-local meterButton = CreateMeterButton()
+function CreateSettingsWindow()
+    if settingsWindow then
+        return settingsWindow
+    else
+        -- Create settings window
+        local settingsWindow = CreateEmptyWindow("DamageMeterSettingsWindow", "UIParent")
+        settingsWindow:SetMovable(true)
+        settingsWindow:SetFrameStrata("HIGH")
+        settingsWindow:SetToplevel(true)
+        settingsWindow:SetWidth(300)
+        settingsWindow:SetHeight(250)
+        settingsWindow:Hide()
 
--- Create settings window
-local settingsWindow = CreateEmptyWindow("DamageMeterSettingsWindow", "UIParent") 
-settingsWindow:SetMovable(true)
-settingsWindow:SetFrameStrata("HIGH")
-settingsWindow:SetToplevel(true)
-settingsWindow:SetWidth(300)
-settingsWindow:SetHeight(250)
-settingsWindow:Hide()
+        -- Create settings title label
+        local settingsTitleLabel = settingsWindow:CreateChildWidget("label", "SettingsTitleLabel", 0, false)
+        settingsTitleLabel:SetText("Damage Meter Settings")
+        settingsTitleLabel:SetPoint("TOPLEFT", settingsWindow, "TOPLEFT", 10, 10)
+        settingsTitleLabel:SetWidth(280)
+        settingsTitleLabel:SetHeight(30)
+        settingsTitleLabel:SetFont("ChatFontNormal")
 
--- Create settings title label
-local settingsTitleLabel = settingsWindow:CreateChildWidget("label", "SettingsTitleLabel", 0, false)
-settingsTitleLabel:SetText("Damage Meter Settings")
-settingsTitleLabel:SetPoint("TOPLEFT", settingsWindow, "TOPLEFT", 10, 10)
-settingsTitleLabel:SetWidth(280)
-settingsTitleLabel:SetHeight(30)
-settingsTitleLabel:SetFont("ChatFontNormal")
+        -- Create show healing checkbox
+        local showHealingLabel = settingsWindow:CreateChildWidget("label", "ShowHealingLabel", 0, false)
+        showHealingLabel:SetText("Show Healing:")
+        showHealingLabel:SetPoint("TOPLEFT", settingsTitleLabel, "BOTTOMLEFT", 0, 20)
+        showHealingLabel:SetWidth(120)
+        showHealingLabel:SetHeight(20)
+        showHealingLabel:SetFont("ChatFontNormal")
 
--- Create show healing checkbox
-local showHealingLabel = settingsWindow:CreateChildWidget("label", "ShowHealingLabel", 0, false)
-showHealingLabel:SetText("Show Healing:")
-showHealingLabel:SetPoint("TOPLEFT", settingsTitleLabel, "BOTTOMLEFT", 0, 20)
-showHealingLabel:SetWidth(120)
-showHealingLabel:SetHeight(20)
-showHealingLabel:SetFont("ChatFontNormal")
+        -- local showHealingCheckbox = CheckBox:new("ShowHealingCheckbox", settingsWindow)
+        local showHealingCheckbox = settingsWindow:CreateChildWidget("checkBox", "ShowHealingCheckbox", 0, false)
+        showHealingCheckbox:SetPoint("LEFT", showHealingLabel, "RIGHT", 10, 0)
+        showHealingCheckbox:SetWidth(20)
+        showHealingCheckbox:SetHeight(20)
 
--- local showHealingCheckbox = CheckBox:new("ShowHealingCheckbox", settingsWindow)
-local showHealingCheckbox = settingsWindow:CreateChildWidget("checkBox", "ShowHealingCheckbox", 0, false)
-showHealingCheckbox:SetPoint("LEFT", showHealingLabel, "RIGHT", 10, 0)
-showHealingCheckbox:SetWidth(20)
-showHealingCheckbox:SetHeight(20)
+        -- Create time window edit
+        local timeWindowLabel = settingsWindow:CreateChildWidget("label", "TimeWindowLabel", 0, false)
+        timeWindowLabel:SetText("Time Window (min):")
+        timeWindowLabel:SetPoint("TOPLEFT", showHealingLabel, "BOTTOMLEFT", 0, 10)
+        timeWindowLabel:SetWidth(120)
+        timeWindowLabel:SetHeight(20)
+        timeWindowLabel:SetFont("ChatFontNormal")
 
--- Create time window edit
-local timeWindowLabel = settingsWindow:CreateChildWidget("label", "TimeWindowLabel", 0, false)
-timeWindowLabel:SetText("Time Window (min):")
-timeWindowLabel:SetPoint("TOPLEFT", showHealingLabel, "BOTTOMLEFT", 0, 10)
-timeWindowLabel:SetWidth(120)
-timeWindowLabel:SetHeight(20)
-timeWindowLabel:SetFont("ChatFontNormal")
+        -- local timeWindowEdit = EditBox:new("TimeWindowEdit", settingsWindow)
+        local timeWindowEdit = settingsWindow:CreateChildWidget("editBox", "TimeWindowEdit", 0, false)
+        timeWindowEdit:SetPoint("LEFT", timeWindowLabel, "RIGHT", 10, 0)
+        timeWindowEdit:SetWidth(50)
+        timeWindowEdit:SetHeight(20)
+        timeWindowEdit:SetFont("ChatFontNormal")
 
--- local timeWindowEdit = EditBox:new("TimeWindowEdit", settingsWindow)
-local timeWindowEdit = settingsWindow:CreateChildWidget("editBox", "TimeWindowEdit", 0, false)
-timeWindowEdit:SetPoint("LEFT", timeWindowLabel, "RIGHT", 10, 0)
-timeWindowEdit:SetWidth(50)
-timeWindowEdit:SetHeight(20)
-timeWindowEdit:SetFont("ChatFontNormal")
+        -- Create target name edit
+        local targetNameLabel = settingsWindow:CreateChildWidget("label", "TargetNameLabel", 0, false)
+        targetNameLabel:SetText("Target Name:")
+        targetNameLabel:SetPoint("TOPLEFT", timeWindowLabel, "BOTTOMLEFT", 0, 10)
+        targetNameLabel:SetWidth(120)
+        targetNameLabel:SetHeight(20)
+        targetNameLabel:SetFont("ChatFontNormal")
 
--- Create target name edit
-local targetNameLabel = settingsWindow:CreateChildWidget("label", "TargetNameLabel", 0, false) 
-targetNameLabel:SetText("Target Name:")
-targetNameLabel:SetPoint("TOPLEFT", timeWindowLabel, "BOTTOMLEFT", 0, 10)
-targetNameLabel:SetWidth(120)
-targetNameLabel:SetHeight(20)
-targetNameLabel:SetFont("ChatFontNormal")
+        -- local targetNameEdit = EditBox:new("TargetNameEdit", settingsWindow)
+        local targetNameEdit = settingsWindow:CreateChildWidget("editBox", "TargetNameEdit", 0, false)
+        targetNameEdit:SetPoint("LEFT", targetNameLabel, "RIGHT", 10, 0)
+        targetNameEdit:SetWidth(120)
+        targetNameEdit:SetHeight(20)
+        targetNameEdit:SetFont("ChatFontNormal")
 
--- local targetNameEdit = EditBox:new("TargetNameEdit", settingsWindow)
-local targetNameEdit = settingsWindow:CreateChildWidget("editBox", "TargetNameEdit", 0, false)
-targetNameEdit:SetPoint("LEFT", targetNameLabel, "RIGHT", 10, 0)
-targetNameEdit:SetWidth(120)
-targetNameEdit:SetHeight(20)
-targetNameEdit:SetFont("ChatFontNormal")
+        -- Create opacity slider
+        local opacityLabel = settingsWindow:CreateChildWidget("label", "OpacityLabel", 0, false)
+        opacityLabel:SetText("Window Opacity:")
+        opacityLabel:SetPoint("TOPLEFT", targetNameLabel, "BOTTOMLEFT", 0, 10)
+        opacityLabel:SetWidth(120)
+        opacityLabel:SetHeight(20)
+        opacityLabel:SetFont("ChatFontNormal")
 
--- Create opacity slider
-local opacityLabel = settingsWindow:CreateChildWidget("label", "OpacityLabel", 0, false)
-opacityLabel:SetText("Window Opacity:")
-opacityLabel:SetPoint("TOPLEFT", targetNameLabel, "BOTTOMLEFT", 0, 10)
-opacityLabel:SetWidth(120)
-opacityLabel:SetHeight(20)
-opacityLabel:SetFont("ChatFontNormal")
+        -- local opacitySlider = Slider:new("OpacitySlider", settingsWindow)
+        local opacitySlider = settingsWindow:CreateChildWidget("slider", "OpacitySlider", 0, false)
+        opacitySlider:SetPoint("LEFT", opacityLabel, "RIGHT", 10, 0)
+        opacitySlider:SetWidth(120)
+        opacitySlider:SetHeight(20)
+        opacitySlider:SetMinMaxValues(0, 100)
+        opacitySlider:SetValue(100)
 
--- local opacitySlider = Slider:new("OpacitySlider", settingsWindow)
-local opacitySlider = settingsWindow:CreateChildWidget("slider", "OpacitySlider", 0, false)
-opacitySlider:SetPoint("LEFT", opacityLabel, "RIGHT", 10, 0)
-opacitySlider:SetWidth(120)
-opacitySlider:SetHeight(20)
-opacitySlider:SetMinMaxValues(0, 100)
-opacitySlider:SetValue(100)
+        -- Create font size slider
+        local fontSizeLabel = settingsWindow:CreateChildWidget("label", "FontSizeLabel", 0, false)
+        fontSizeLabel:SetText("Font Size:")
+        fontSizeLabel:SetPoint("TOPLEFT", opacityLabel, "BOTTOMLEFT", 0, 10)
+        fontSizeLabel:SetWidth(120)
+        fontSizeLabel:SetHeight(20)
+        fontSizeLabel:SetFont("ChatFontNormal")
 
--- Create font size slider
-local fontSizeLabel = settingsWindow:CreateChildWidget("label", "FontSizeLabel", 0, false)
-fontSizeLabel:SetText("Font Size:")
-fontSizeLabel:SetPoint("TOPLEFT", opacityLabel, "BOTTOMLEFT", 0, 10)
-fontSizeLabel:SetWidth(120)
-fontSizeLabel:SetHeight(20)
-fontSizeLabel:SetFont("ChatFontNormal")
+        -- local fontSizeSlider = Slider:new("FontSizeSlider", settingsWindow)
+        local fontSizeSlider = settingsWindow:CreateChildWidget("slider", "FontSizeSlider", 0, false)
+        fontSizeSlider:SetPoint("LEFT", fontSizeLabel, "RIGHT", 10, 0)
+        fontSizeSlider:SetWidth(120)
+        fontSizeSlider:SetHeight(20)
+        fontSizeSlider:SetMinMaxValues(8, 20)
+        fontSizeSlider:SetValue(12)
 
--- local fontSizeSlider = Slider:new("FontSizeSlider", settingsWindow)
-local fontSizeSlider = settingsWindow:CreateChildWidget("slider", "FontSizeSlider", 0, false)
-fontSizeSlider:SetPoint("LEFT", fontSizeLabel, "RIGHT", 10, 0)
-fontSizeSlider:SetWidth(120)
-fontSizeSlider:SetHeight(20)
-fontSizeSlider:SetMinMaxValues(8, 20)
-fontSizeSlider:SetValue(12)
+        -- Create save button
+        local settingsSaveButton = CreateButton("Save", -300, 15, SaveSettings) -- Button:new("SettingsSaveButton", settingsWindow)
+        settingsSaveButton:SetText("Save")
+        settingsSaveButton:SetPoint("BOTTOMLEFT", settingsWindow, "BOTTOMLEFT", 10, 10)
+        settingsSaveButton:SetWidth(80)
+        settingsSaveButton:SetHeight(20)
+        settingsSaveButton:SetFont("ChatFontNormal")
 
--- Create save button
-local settingsSaveButton = CreateButton("Save", -300, 15, SaveSettings) -- Button:new("SettingsSaveButton", settingsWindow)
-settingsSaveButton:SetText("Save")
-settingsSaveButton:SetPoint("BOTTOMLEFT", settingsWindow, "BOTTOMLEFT", 10, 10)
-settingsSaveButton:SetWidth(80)
-settingsSaveButton:SetHeight(20)
-settingsSaveButton:SetFont("ChatFontNormal")
+        -- Create cancel button
+        local settingsCancelButton = CreateButton("Cancel", -300, 15, CloseSettings) -- Button:new("SettingsCancelButton", settingsWindow)
+        settingsCancelButton:SetText("Cancel")
+        settingsCancelButton:SetPoint("LEFT", settingsSaveButton, "RIGHT", 10, 0)
+        settingsCancelButton:SetWidth(80)
+        settingsCancelButton:SetHeight(20)
+        settingsCancelButton:SetFont("ChatFontNormal")
 
--- Create cancel button
-local settingsCancelButton = CreateButton("Cancel", -300, 15, CloseSettings) -- Button:new("SettingsCancelButton", settingsWindow)
-settingsCancelButton:SetText("Cancel")
-settingsCancelButton:SetPoint("LEFT", settingsSaveButton, "RIGHT", 10, 0)
-settingsCancelButton:SetWidth(80)
-settingsCancelButton:SetHeight(20)
-settingsCancelButton:SetFont("ChatFontNormal")
+        return settingsWindow
+    end
+end
 
 -- Function called when the addon is loaded
 function OnLoad()
@@ -473,7 +477,7 @@ end
 
 -- Function to open settings
 function OpenSettings()
-    settingsWindow:Show()
+    settingsWindow:Show(true)
 end
 
 -- Function to close settings
@@ -597,26 +601,8 @@ end
 local function EnteredWorld()
     DebugMessage("EnteredWorld called")
     CreateMeterButton()
+    CreateSettingsWindow()
 end
 
 -- Register the EnteredWorld event
 UIParent:SetEventHandler(UIEVENT_TYPE.ENTERED_WORLD, EnteredWorld)
-
--- Check if button.lua functions are available
-if not CreateButton then
-    DebugMessage("ERROR - CreateButton function not found")
-else
-    DebugMessage("CreateButton function found")
-end
-
-if not ApplyButtonSkin then
-    DebugMessage("ERROR - ApplyButtonSkin function not found")
-else
-    DebugMessage("ApplyButtonSkin function found")
-end
-
-if not GetButtonSkin then
-    DebugMessage("ERROR - GetButtonSkin function not found")
-else
-    DebugMessage("GetButtonSkin function found")
-end
