@@ -1,0 +1,22 @@
+{
+  "name": "archerage-damage-heal-meter-overlay",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 1420",
+    "build": "tsc && vite build",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.11.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.11.2",
+    "esbuild": "^0.28.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.16"
+  }
+}

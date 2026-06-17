@@ -9,8 +9,8 @@
     "overlayLogsFontSize": 12,
     "overlayOpacity": "7",
     "overlayLogColor": "#ff55ff",
-    "logFilePath": "C:\\Users\\YOUR-USERNAME\\Documents\\ArcheRage\\Combat.log-FIX-ME",
+    "logFilePath": "",
     "logMinutesAgo": 10,
     "targetName": "",
-    "logType": "heal"
+    "logType": "damage"
 }
