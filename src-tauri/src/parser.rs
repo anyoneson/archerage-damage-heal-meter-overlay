@@ -38,6 +38,9 @@ const TARGET_PREFIX_MARKERS: &[&str] = &[
     "targeted ",
     " attacked ",
     " targeted ",
+    "\u{5bf9}",
+    "\u{653b}\u{51fb}\u{4e86}",
+    "\u{653b}\u{51fb}\u{4e86} ",
     "атаковал ",
     "атаковала ",
     "атаковали ",
@@ -206,6 +209,36 @@ mod tests {
         assert_eq!(format_number(999), "999");
         assert_eq!(format_number(1_250), "1.2k");
         assert_eq!(format_number(1_250_000), "1.2M");
+    }
+
+    #[test]
+    fn parses_chinese_damage_line() {
+        let line = concat!(
+            "<2026-06-16 12:00:00|ic23895;Catsama|r",
+            "\u{7528}|cff25fcff\u{5730}\u{72f1}\u{957f}\u{67aa}\u{ff1a}\u{70c8}\u{7130}|r",
+            "\u{5bf9}\u{6252}\u{624b}|r",
+            "\u{9020}\u{6210}|cffff0000-3903|r|cffff0000\u{751f}\u{547d}\u{503c}|r",
+            "|cffff0000\u{4f24}\u{5bb3}|r\u{4f24}\u{5bb3}\u{3002}"
+        );
+        let event = parse_line(line, LogType::Damage).expect("chinese damage event");
+
+        assert_eq!(event.character, "Catsama");
+        assert_eq!(event.target, "\u{6252}\u{624b}");
+        assert_eq!(event.amount, 3_903);
+    }
+
+    #[test]
+    fn parses_chinese_heal_line() {
+        let line = concat!(
+            "<2026-06-16 12:00:00|ic23895;Alice|r",
+            "\u{5bf9}Bob|r\u{4f7f}\u{7528}|cff25fcff\u{6280}\u{80fd}|r",
+            "\u{6062}\u{590d}\u{4e86}|cff00ff0012345|r\u{751f}\u{547d}\u{503c}\u{3002}"
+        );
+        let event = parse_line(line, LogType::Heal).expect("chinese heal event");
+
+        assert_eq!(event.character, "Alice");
+        assert_eq!(event.target, "Bob");
+        assert_eq!(event.amount, 12_345);
     }
 
     #[test]

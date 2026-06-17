@@ -27,7 +27,7 @@ The app reads `Combat.log`, aggregates damage or healing by character, and displ
 - Target filter
 - Configurable size, opacity, font size, log color, and time window
 - "Set time" button to reset the meter from the current moment
-- Log parser support for EN, KR, RU, and color-coded ArcheAge log variants
+- Log parser support for EN, KR, RU, CN, and color-coded ArcheAge log variants
 
 ## Download For Players
 
