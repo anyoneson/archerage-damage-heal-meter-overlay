@@ -2,3 +2,12 @@ temp/
 dist/
 build/
 *.spec
+node_modules/
+src-tauri/target/
+src-tauri/src-tauri/
+src-tauri/gen/
+release/
+*.zip
+*.log
+*.tmp
+*.bak

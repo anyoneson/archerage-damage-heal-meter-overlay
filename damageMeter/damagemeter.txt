@@ -1,5 +1,0 @@
-Name: DamageMeter
-Author: Xizde
-Version: 1.0
-Desc: Medidor de dano/cura para ArcheRage
-SavedVariables: DamageMeterDB 

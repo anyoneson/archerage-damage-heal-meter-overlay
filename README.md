@@ -1,65 +1,158 @@
 # ArcheRage Damage/Heal Meter Overlay
-If you like this, please buy me a coffe ☕ https://bmc.link/Xizde
 
-![aesthetic overlay image](https://user-images.githubusercontent.com/126599430/222024598-1bf74aa2-4f6d-4d37-a9ed-c1d14f083727.png)
-![Image](https://github.com/user-attachments/assets/961cabc8-75f3-4066-b608-bad456c69400)
+Lightweight Windows overlay for ArcheRage combat logs, rewritten in Rust + Tauri v2.
 
-ArcheRage Damage/Heal Meter Overlay is a meter that shows damage and healing done by players from game logs. It was developed in Python using PyQt5 to create the interface.
+The app reads `Combat.log`, aggregates damage or healing by character, and displays a small always-on-top overlay while you play.
 
-![Image](https://github.com/user-attachments/assets/78bac5da-4ea7-43c9-959c-76d8b8d809a2)
+## Screenshots
 
-![overlay](https://user-images.githubusercontent.com/126599430/222025011-647d57e8-8da1-4488-9a76-8cdd17085da0.png)
+### Damage
+
+![Damage overlay preview](preview-damage.jpg)
+
+### Heal
+
+![Heal overlay preview](preview-heal.jpg)
+
+### Settings
+
+![Settings preview](preview-settings.jpg)
 
 ## Features
 
-![image](https://user-images.githubusercontent.com/126599430/221975388-b2135b5b-7af1-4a6d-9b80-15955bb082d5.png)
+- Near real-time damage and healing meter from `Combat.log`
+- Low-overhead Rust backend with incremental log reading
+- Transparent always-on-top overlay
+- Damage/heal modes
+- Target filter
+- Configurable size, opacity, font size, log color, and time window
+- "Set time" button to reset the meter from the current moment
+- Log parser support for EN, KR, RU, CN, and color-coded ArcheAge log variants
 
-- Displays damage and healing done by players in near-real-time
-- Customizable settings, including log file path, overlay width and height, overlay opacity, log type, target name, minutes ago, position of the overlay, set a timer for filter logs and log color
-- Minimize button to hide the entire UI of the overlay
+## Download For Players
 
-![setting-window](https://user-images.githubusercontent.com/126599430/221931472-d3fec8cb-b21e-4a13-854c-0e5322322bec.png)
-![damage-mainwindow](https://user-images.githubusercontent.com/126599430/221931325-5e8314a2-1f90-46fb-a8ec-53d1b1065d44.png)
-![damage-mainwindow-filter-target-name](https://user-images.githubusercontent.com/126599430/221931340-e2009dca-9de2-480b-a4e3-6da4e94dfedc.png)
-![heal-mainwindow](https://user-images.githubusercontent.com/126599430/221931361-fd205a4c-2c13-4319-a4df-ec160cda54f7.png)
-![mainwindow-with-different-log-collor](https://user-images.githubusercontent.com/126599430/221931391-1ef6465b-77ad-440f-b941-dffeb9e023e9.png)
-![minimized-window](https://user-images.githubusercontent.com/126599430/221931460-7a44ddac-5ad4-48fe-85d0-77a37f2598e0.png)
+Use the packaged release ZIP or installer generated from this repository.
 
-## Getting Started
+Portable ZIP contents:
 
-The ArcheRage Game Overlay allows players to monitor data during PVP/PVE battles. It helps players keep track of their performance and improve their gameplay.
+```text
+archerage_meter_overlay.exe
+config.json
+README.txt
+```
 
-## Installation
+Run `archerage_meter_overlay.exe`. On Windows, the app tries to use this default log path automatically:
 
-Instalation guide on youtube: https://www.youtube.com/watch?v=GyfF6G-qFAE
+```text
+C:\Users\<your-user>\Documents\ArcheRage\Combat.log
+```
 
-Note: To use the ArcheRage Game Overlay, you just need to set up the config.json "logFilePath" variable to your log location and then execute the app.exe.
+If your log is somewhere else, open `Settings` in the overlay and change `Log file path`.
 
-## Usage
+## In-Game Setup
 
-To use the ArcheRage Game Overlay, you need to configure the settings based on your preferences. You can customize the log file path, overlay width and height, overlay opacity, log type, target name, minutes ago, and log color. Once you have configured the settings, you can execute the executable file and start playing the game and the overlay will display the damage and healing done by players in near-real-time.
+Enable combat logging in the ArcheRage client. The combat log is normally written to:
 
-## Contributing
+```text
+Documents\ArcheRage\Combat.log
+```
 
-If you would like to contribute to the ArcheRage Game Overlay, please fork the repository and submit a pull request. Also you can request changes for me in discord Xizde#8742.
+If the meter shows no rows, check that:
+
+- ArcheRage is writing to `Combat.log`
+- `Log file path` points to the correct file
+- `Log type` is set to `damage` or `heal` as needed
+- `Minutes ago` covers the time when combat happened
+- `Target name` is empty, or exactly matches the target you want to filter
+
+## Configuration
+
+The app reads `config.json` from the same folder as the executable when packaged.
+
+Example:
+
+```json
+{
+  "overlayPosition": [30, 30],
+  "overlayWidth": 330,
+  "overlayHeight": 270,
+  "overlayFontSize": 14,
+  "overlayLogsFontSize": 12,
+  "overlayOpacity": "7",
+  "overlayLogColor": "#ff55ff",
+  "logFilePath": "",
+  "logMinutesAgo": 10,
+  "targetName": "",
+  "logType": "damage"
+}
+```
+
+Leaving `logFilePath` empty makes the app use the default ArcheRage path for the current Windows user.
+
+## Development
+
+Requirements:
+
+- Windows
+- Rust stable
+- Node.js + npm
+- Microsoft WebView2 Runtime
+- Visual Studio Build Tools with MSVC
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run in development mode:
+
+```bash
+npm run tauri:dev
+```
+
+Run checks:
+
+```bash
+npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+```
+
+Build release binaries:
+
+```bash
+npm run tauri:build
+```
+
+Generated binaries:
+
+```text
+src-tauri/target/release/archerage_meter_overlay.exe
+src-tauri/target/release/bundle/nsis/ArcheRage Meter_0.1.0_x64-setup.exe
+src-tauri/target/release/bundle/msi/ArcheRage Meter_0.1.0_x64_en-US.msi
+```
+
+## Project Layout
+
+```text
+src/                 Tauri frontend overlay UI
+src-tauri/src/       Rust backend, config, parser, meter state
+config.json          Default runtime configuration
+icon.ico             Windows app icon
+```
+
+## Packaging
+
+After `npm run tauri:build`, create a player ZIP with:
+
+```text
+archerage_meter_overlay.exe
+config.json
+README.txt
+```
+
+The generated ZIP in `release/` is ignored by git and can be uploaded to GitHub Releases, Discord, or the ArcheRage forum.
 
 ## License
 
-This project is licensed under the MIT License.
-
-### Dependencies
-
-- Python 3.6 or later
-- PyQt5 5.15.4 or later
-
-### System Requirements
-
-- Windows
-- Internet connection
-- ArcheRage installed
-
-### Contact
-
-If you have any questions or feedback, please contact Xizde#8742 at Discord.
-
-
+MIT. See [LICENSE](LICENSE).
